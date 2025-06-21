@@ -1,0 +1,29 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Surah {
+  id               Int    @id @default(autoincrement())
+  name             String @unique
+  relevation_place String
+  total_ayahs      Int
+  ayahs            Ayah[]
+
+  @@map("surahs")
+}
+
+model Ayah {
+  id     Int    @id @default(autoincrement())
+  number Int
+  arabic String
+
+  surahId Int
+  surah   Surah @relation(fields: [surahId], references: [id])
+
+  @@map("ayahs")
+}

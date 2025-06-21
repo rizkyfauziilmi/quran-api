@@ -1,0 +1,15 @@
+services:
+  dev-db:
+    image: postgres:latest
+    container_name: quran-api-dev-db
+    environment:
+      POSTGRES_USER: quran_dev
+      POSTGRES_PASSWORD: 12345678
+      POSTGRES_DB: quran_dev_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
