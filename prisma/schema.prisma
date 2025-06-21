@@ -8,22 +8,55 @@ generator client {
 }
 
 model Surah {
-  id               Int    @id @default(autoincrement())
-  name             String @unique
-  relevation_place String
-  total_ayahs      Int
-  ayahs            Ayah[]
+  number         Int    @id @unique
+  name           String @unique
+  arabicName     String @unique
+  englishName    String @unique
+  surahMeaning   String
+  ayahsCount     Int
+  classification String
+
+  juzId Int
+  juz   Juz @relation(fields: [juzId], references: [number])
+
+  ayahs Ayah[]
 
   @@map("surahs")
 }
 
+model Juz {
+  number      Int    @id @unique
+  arabicName  String
+  englishName String
+
+  surahs Surah[]
+
+  @@map("juzs")
+}
+
 model Ayah {
-  id     Int    @id @default(autoincrement())
-  number Int
-  arabic String
+  id         Int    @id @default(autoincrement())
+  number     Int
+  text       String
+  arabicText String
 
   surahId Int
-  surah   Surah @relation(fields: [surahId], references: [id])
+  surah   Surah @relation(fields: [surahId], references: [number])
 
+  translations Translation[]
+
+  @@unique([number, surahId])
   @@map("ayahs")
+}
+
+model Translation {
+  id             Int    @id @default(autoincrement())
+  languageCode   String // Use ISO 639-1 codes, e.g., "en", "ar", "fr"
+  translatedText String
+
+  ayahId Int
+  ayah   Ayah @relation(fields: [ayahId], references: [id])
+
+  @@unique([ayahId, languageCode])
+  @@map("translations")
 }

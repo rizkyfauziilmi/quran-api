@@ -3,6 +3,10 @@
 /node_modules
 /build
 
+# Ignore all .csv and .xlsx files in dataset folder and its subfolders
+/dataset/**/*.csv
+/dataset/**/*.xlsx
+
 # Logs
 logs
 *.log
