@@ -9,15 +9,14 @@ generator client {
 
 model Surah {
   number         Int    @id @unique
-  name           String @unique
   arabicName     String @unique
-  englishName    String @unique
+  latinName      String @unique
   surahMeaning   String
   ayahsCount     Int
   classification String
 
   juzId Int
-  juz   Juz @relation(fields: [juzId], references: [number])
+  juz   Juz @relation(fields: [juzId], references: [number], onDelete: Cascade)
 
   ayahs Ayah[]
 
@@ -25,9 +24,9 @@ model Surah {
 }
 
 model Juz {
-  number      Int    @id @unique
-  arabicName  String
-  englishName String
+  number     Int    @id @unique
+  arabicName String
+  latinName  String
 
   surahs Surah[]
 
@@ -35,13 +34,14 @@ model Juz {
 }
 
 model Ayah {
-  id         Int    @id @default(autoincrement())
-  number     Int
-  text       String
-  arabicText String
+  id                 Int    @id @default(autoincrement())
+  number             Int
+  arabicText         String
+  originalArabicText String
+  transliteration    String
 
   surahId Int
-  surah   Surah @relation(fields: [surahId], references: [number])
+  surah   Surah @relation(fields: [surahId], references: [number], onDelete: Cascade)
 
   translations Translation[]
 
@@ -55,7 +55,7 @@ model Translation {
   translatedText String
 
   ayahId Int
-  ayah   Ayah @relation(fields: [ayahId], references: [id])
+  ayah   Ayah @relation(fields: [ayahId], references: [id], onDelete: Cascade)
 
   @@unique([ayahId, languageCode])
   @@map("translations")
