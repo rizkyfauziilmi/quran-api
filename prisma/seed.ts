@@ -2,7 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import xlsx from 'xlsx';
 import path from 'path';
 import cliProgress from 'cli-progress';
-import { transliterate as tr } from 'transliteration';
+import transliteration from '../cli/dataset/transliteration.json';
+import indonesianTranslations from '../cli/dataset/indonesia.json';
 
 const prisma = new PrismaClient();
 
@@ -110,8 +111,10 @@ async function seedQuranData(rows: QuranRow[]) {
         number: row.AyahNo,
         arabicText: row.ArabicText,
         originalArabicText: row.OrignalArabicText,
-        // TODO: scrape translation
-        transliteration: tr(row.OrignalArabicText),
+        transliteration:
+          transliteration.find(
+            (t) => t.surahId === row.SurahNo && t.ayahNumber === row.AyahNo,
+          )?.text || '',
         surahId: row.SurahNo,
         translations: {
           create: [
@@ -166,6 +169,52 @@ async function updateSurahAyahsCount(surahMap: Map<number, SurahInfo>) {
   console.log('All Surah ayahsCount updated.');
 }
 
+async function seedTranslations() {
+  if (indonesianTranslations.length !== 6236) {
+    console.log(
+      'Warning: Indonesian translations dataset does not contain 6236 entries. Please check the dataset, skipping seeding.',
+    );
+    return;
+  }
+
+  console.log('Seeding Indonesian translations...');
+  const bar = new cliProgress.SingleBar({
+    format:
+      'Seeding Indonesia Translations |{bar}| {percentage}% | {value}/{total} translations | {current}',
+    barCompleteChar: '\u2588',
+    barIncompleteChar: '\u2591',
+    hideCursor: true,
+  });
+
+  bar.start(indonesianTranslations.length, 0, { current: 'Starting...' });
+
+  let processed = 0;
+  for (const translation of indonesianTranslations) {
+    await prisma.translation.create({
+      data: {
+        languageCode: 'id',
+        translatedText: translation.text,
+        ayah: {
+          connect: {
+            number_surahId: {
+              number: translation.ayahNumber,
+              surahId: translation.surahId,
+            },
+          },
+        },
+      },
+    });
+
+    processed++;
+    bar.update(processed, {
+      current: `Surah ${translation.surahId} - Verse ${translation.ayahNumber}`,
+    });
+  }
+
+  bar.stop();
+  console.log('Indonesian translations seeded successfully.');
+}
+
 async function main() {
   await deleteExistingData();
   const rows = loadExcelRows();
@@ -190,6 +239,7 @@ async function main() {
     },
   ]);
   await updateSurahAyahsCount(surahMap);
+  await seedTranslations();
   console.log('Seeding completed!');
 }
 
