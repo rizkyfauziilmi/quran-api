@@ -4,8 +4,9 @@
 /build
 
 # Ignore all .csv and .xlsx files in dataset folder and its subfolders
-/dataset/**/*.csv
-/dataset/**/*.xlsx
+/cli/dataset/**/*.csv
+/cli/dataset/**/*.xlsx
+/cli/dataset/**/*.json
 
 # Logs
 logs

@@ -35,7 +35,10 @@ async function deleteExistingData() {
 }
 
 function loadExcelRows(): QuranRow[] {
-  const filePath = path.join(__dirname, '../cli/Dataset-Verse-by-Verse.xlsx');
+  const filePath = path.join(
+    __dirname,
+    '../cli/dataset/Dataset-Verse-by-Verse.xlsx',
+  );
   console.log(`Reading Excel file from: ${filePath}`);
   const workbook = xlsx.readFile(filePath);
   const sheetName = workbook.SheetNames[0];
