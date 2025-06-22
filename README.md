@@ -1,403 +1,285 @@
-# 📖 API Documentation – Qur'an API (NestJS)
+# Quran API Endpoints Documentation
+
+This API provides **read-only** access to Quranic data: Surahs, Juzs, Ayahs, and Translations. All endpoints return JSON.
 
 ---
 
-## ✅ 1. **GET /surahs**
+## Response Format
 
-### Deskripsi:
-
-Mengambil daftar seluruh surah dalam Al-Qur'an.
-
-### Response:
-
+All responses follow this structure:
 ```json
-[
-  {
+{
+  "status": "success",
+  "message": "OK",
+  "data": ... // the actual result (object, array, or null)
+}
+```
+For errors:
+```json
+{
+  "status": "error",
+  "message": "Not Found",
+  "code": 404
+}
+```
+
+---
+
+## Surahs
+
+### List All Surahs
+- **GET** `/
+api/surahs`
+- **Query:** `classification`, `juz`, `page`, `limit`
+- **Returns:** Array of Surahs
+**Example:**
+```json
+{
+  "status": "success",
+  "message": "OK",
+  "data": [
+    {
+      "number": 1,
+      "arabicName": "الفاتحة",
+      "latinName": "Al-Fatihah",
+      "surahMeaning": "The Opening",
+      "ayahsCount": 7,
+      "classification": "Meccan",
+      "juzId": 1
+    }
+    // ...
+  ]
+}
+```
+
+### Get Surah by Number
+- **GET** `/api/surahs/:number`
+- **Returns:** Surah with Ayahs
+**Example:**
+```json
+{
+  "status": "success",
+  "message": "OK",
+  "data": {
     "number": 1,
-    "name": "Al-Fatihah",
     "arabicName": "الفاتحة",
-    "englishName": "The Opening",
-    "surahMeaning": "Pembukaan",
+    "latinName": "Al-Fatihah",
+    "surahMeaning": "The Opening",
     "ayahsCount": 7,
     "classification": "Meccan",
-    "juzId": 1
-  },
-  {
-    "number": 2,
-    "name": "Al-Baqarah",
-    "arabicName": "البقرة",
-    "englishName": "The Cow",
-    "surahMeaning": "Sapi Betina",
-    "ayahsCount": 286,
-    "classification": "Medinan",
-    "juzId": 1
+    "juzId": 1,
+    "ayahs": [
+      {
+        "id": 1,
+        "number": 1,
+        "arabicText": "...",
+        "originalArabicText": "...",
+        "transliteration": "Bismillahir Rahmanir Raheem"
+      }
+      // ...
+    ]
   }
-]
+}
 ```
-
-### Error:
-
-Tidak ada (selalu berhasil, kecuali error server `500`)
 
 ---
 
-## ✅ 2. **GET /surahs/:number**
+## Juzs
 
-### Deskripsi:
-
-Mengambil detail surah beserta ayat-ayatnya.
-
-### Contoh: `GET /surahs/1`
-
-### Response:
-
+### List All Juzs
+- **GET** `/api/juzs`
+- **Returns:** Array of Juzs
+**Example:**
 ```json
 {
-  "number": 1,
-  "name": "Al-Fatihah",
-  "arabicName": "الفاتحة",
-  "englishName": "The Opening",
-  "surahMeaning": "Pembukaan",
-  "ayahsCount": 7,
-  "classification": "Meccan",
-  "juzId": 1,
-  "ayahs": [
+  "status": "success",
+  "message": "OK",
+  "data": [
     {
       "number": 1,
-      "text": "In the name of Allah, the Entirely Merciful, the Especially Merciful.",
-      "arabicText": "بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ",
-      "translations": [
-        {
-          "languageCode": "en",
-          "translatedText": "In the name of Allah, the Entirely Merciful, the Especially Merciful."
-        },
-        {
-          "languageCode": "id",
-          "translatedText": "Dengan nama Allah Yang Maha Pengasih, Maha Penyayang."
-        }
-      ]
+      "arabicName": "الجزء الأول",
+      "latinName": "Al-Juz' al-Awwal"
     }
-    // ... ayat lainnya
+    // ...
   ]
 }
 ```
 
-### Error:
-
-* `404 Not Found`: Jika nomor surah tidak ditemukan
-
+### Get Juz by Number
+- **GET** `/api/juzs/:number`
+- **Returns:** Juz with Surahs
+**Example:**
 ```json
 {
-  "statusCode": 404,
-  "message": "Surah not found",
-  "error": "Not Found"
-}
-```
-
----
-
-## ✅ 3. **GET /surahs/:surahNumber/ayahs/:ayahNumber**
-
-### Deskripsi:
-
-Mengambil satu ayat dari surah tertentu.
-
-### Contoh: `GET /surahs/2/ayahs/255`
-
-### Response:
-
-```json
-{
-  "surahNumber": 2,
-  "ayahNumber": 255,
-  "text": "Allah! There is no deity except Him, the Ever-Living, the Sustainer of [all] existence...",
-  "arabicText": "اللَّهُ لَا إِلَـٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ...",
-  "translations": [
-    {
-      "languageCode": "en",
-      "translatedText": "Allah! There is no deity except Him, the Ever-Living, the Sustainer of [all] existence..."
-    },
-    {
-      "languageCode": "id",
-      "translatedText": "Allah, tidak ada Tuhan selain Dia, Yang Maha Hidup, Yang terus-menerus mengurus makhluk-Nya..."
-    }
-  ]
-}
-```
-
-### Error:
-
-* `404 Not Found`: Jika surah atau ayat tidak ditemukan
-
-```json
-{
-  "statusCode": 404,
-  "message": "Ayah not found",
-  "error": "Not Found"
-}
-```
-
----
-
-## ✅ 4. **GET /juzs**
-
-### Deskripsi:
-
-Mengambil daftar seluruh juz dalam Al-Qur'an.
-
-### Response:
-
-```json
-[
-  {
+  "status": "success",
+  "message": "OK",
+  "data": {
     "number": 1,
     "arabicName": "الجزء الأول",
-    "englishName": "Juz 1"
-  },
-  {
-    "number": 2,
-    "arabicName": "الجزء الثاني",
-    "englishName": "Juz 2"
+    "latinName": "Al-Juz' al-Awwal",
+    "surahs": [
+      {
+        "number": 1,
+        "arabicName": "الفاتحة",
+        "latinName": "Al-Fatihah"
+      }
+      // ...
+    ]
   }
-]
+}
 ```
 
 ---
 
-## ✅ 5. **GET /juzs/:number**
+## Ayahs
 
-### Deskripsi:
-
-Mengambil detail juz beserta daftar surah di dalamnya.
-
-### Contoh: `GET /juzs/1`
-
-### Response:
-
+### List Ayahs of a Surah
+- **GET** `/api/surahs/:surahNumber/ayahs`
+- **Query:** `page`, `limit`
+- **Returns:** Array of Ayahs
+**Example:**
 ```json
 {
-  "number": 1,
-  "arabicName": "الجزء الأول",
-  "englishName": "Juz 1",
-  "surahs": [
+  "status": "success",
+  "message": "OK",
+  "data": [
     {
+      "id": 1,
       "number": 1,
-      "name": "Al-Fatihah",
-      "arabicName": "الفاتحة",
-      "englishName": "The Opening",
-      "surahMeaning": "Pembukaan",
-      "ayahsCount": 7,
-      "classification": "Meccan"
-    },
-    {
-      "number": 2,
-      "name": "Al-Baqarah",
-      "arabicName": "البقرة",
-      "englishName": "The Cow",
-      "surahMeaning": "Sapi Betina",
-      "ayahsCount": 286,
-      "classification": "Medinan"
+      "arabicText": "...",
+      "originalArabicText": "...",
+      "transliteration": "Bismillahir Rahmanir Raheem"
     }
+    // ...
   ]
 }
 ```
 
-### Error:
-
-* `404 Not Found`: Jika nomor juz tidak ditemukan
-
+### Get Ayah by ID
+- **GET** `/api/ayahs/:id`
+- **Returns:** Ayah with Translations
+**Example:**
 ```json
 {
-  "statusCode": 404,
-  "message": "Juz not found",
-  "error": "Not Found"
-}
-```
-
----
-
-## ✅ 6. **GET /search?q=:query**
-
-### Deskripsi:
-
-Mencari ayat berdasarkan kata kunci dari terjemahan (Translation.translatedText).
-
-### Contoh: `GET /search?q=sabar`
-
-### Response:
-
-```json
-[
-  {
-    "surahNumber": 2,
-    "surahName": "Al-Baqarah",
-    "ayahNumber": 153,
-    "text": "O you who have believed, seek help through patience and prayer...",
-    "arabicText": "يَا أَيُّهَا الَّذِينَ آمَنُوا اسْتَعِينُوا بِالصَّبْرِ...",
+  "status": "success",
+  "message": "OK",
+  "data": {
+    "id": 1,
+    "number": 1,
+    "arabicText": "...",
+    "originalArabicText": "...",
+    "transliteration": "...",
+    "surahId": 1,
     "translations": [
       {
         "languageCode": "en",
-        "translatedText": "O you who have believed, seek help through patience and prayer..."
-      },
+        "translatedText": "In the name of Allah, the Most Gracious, the Most Merciful"
+      }
+      // ...
+    ]
+  }
+}
+```
+
+---
+
+## Translations
+
+### List Translations for an Ayah
+- **GET** `/api/ayahs/:ayahId/translations`
+- **Query:** `languageCode`
+- **Returns:** Array of Translations
+**Example:**
+```json
+{
+  "status": "success",
+  "message": "OK",
+  "data": [
+    {
+      "languageCode": "en",
+      "translatedText": "In the name of Allah, the Most Gracious, the Most Merciful"
+    }
+    // ...
+  ]
+}
+```
+
+### Get Translation by Ayah and Language
+- **GET** `/api/ayahs/:ayahId/translations/:languageCode`
+- **Returns:** Translation
+**Example:**
+```json
+{
+  "status": "success",
+  "message": "OK",
+  "data": {
+    "languageCode": "en",
+    "translatedText": "In the name of Allah, the Most Gracious, the Most Merciful"
+  }
+}
+```
+
+---
+
+## Search & Advanced
+
+### Search Ayahs
+- **GET** `/api/ayahs/search`
+- **Query:** `q`, `languageCode`, `surah`, `juz`
+- **Returns:** Array of Ayahs
+**Example:**
+```json
+{
+  "status": "success",
+  "message": "OK",
+  "data": [
+    {
+      "id": 1,
+      "number": 1,
+      "arabicText": "...",
+      "originalArabicText": "...",
+      "transliteration": "Bismillahir Rahmanir Raheem",
+      "surahId": 1
+    }
+    // ...
+  ]
+}
+```
+
+### Get Random Ayah
+- **GET** `/api/ayahs/random`
+- **Query:** `languageCode`
+- **Returns:** Random Ayah
+**Example:**
+```json
+{
+  "status": "success",
+  "message": "OK",
+  "data": {
+    "id": 5,
+    "number": 5,
+    "arabicText": "...",
+    "originalArabicText": "...",
+    "transliteration": "...",
+    "surahId": 1,
+    "translations": [
       {
-        "languageCode": "id",
-        "translatedText": "Hai orang-orang yang beriman, jadikanlah sabar dan salat sebagai penolongmu..."
+        "languageCode": "en",
+        "translatedText": "Master of the Day of Judgment"
       }
     ]
   }
-  // ... hasil lainnya
-]
-```
-
-### Error:
-
-* `400 Bad Request`: Jika parameter query kosong
-
-```json
-{
-  "statusCode": 400,
-  "message": "Query parameter 'q' is required",
-  "error": "Bad Request"
 }
 ```
 
 ---
 
-## ✅ 7. **GET /tafsir/:surahNumber/:ayahNumber** *(opsional)*
-
-### Deskripsi:
-
-Mengambil tafsir ayat tertentu (jika tersedia).
-
-### Contoh: `GET /tafsir/2/255`
-
-### Response:
+## Error Example
 
 ```json
 {
-  "surahNumber": 2,
-  "ayahNumber": 255,
-  "tafsir": "Ayat Kursi adalah ayat yang menjelaskan tentang keesaan dan kekuasaan Allah..."
-}
-```
-
-### Error:
-
-* `404 Not Found`: Jika tafsir tidak tersedia
-
-```json
-{
-  "statusCode": 404,
-  "message": "Tafsir not found for this ayah",
-  "error": "Not Found"
-}
-```
-
----
-
-## 🔐 8. **POST /bookmark** *(opsional, butuh login)*
-
-### Deskripsi:
-
-Menyimpan bookmark ayat untuk user.
-
-### Request Body:
-
-```json
-{
-  "surahNumber": 2,
-  "ayahNumber": 255
-}
-```
-
-### Response:
-
-```json
-{
-  "message": "Bookmark saved successfully"
-}
-```
-
-### Error:
-
-* `401 Unauthorized`: Jika tidak ada token
-
-```json
-{
-  "statusCode": 401,
-  "message": "Unauthorized",
-  "error": "Unauthorized"
-}
-```
-
-* `400 Bad Request`: Data tidak valid
-
----
-
-## 🔐 9. **GET /user/bookmarks** *(opsional, login required)*
-
-### Deskripsi:
-
-Mengambil daftar bookmark milik user.
-
-### Response:
-
-```json
-[
-  {
-    "surahNumber": 2,
-    "ayahNumber": 255,
-    "text": "...",
-    "arabicText": "...",
-    "translations": [
-      {
-        "languageCode": "en",
-        "translatedText": "..."
-      }
-    ],
-    "timestamp": "2025-06-20T15:00:00Z"
-  }
-]
-```
-
----
-
-## 🔐 10. **POST /auth/login** *(opsional)*
-
-### Request:
-
-```json
-{
-  "email": "user@example.com",
-  "password": "secret"
-}
-```
-
-### Response:
-
-```json
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI..."
-}
-```
-
----
-
-## 🔐 11. **POST /auth/register** *(opsional)*
-
-### Request:
-
-```json
-{
-  "email": "user@example.com",
-  "password": "secret"
-}
-```
-
-### Response:
-
-```json
-{
-  "message": "User registered successfully"
+  "status": "error",
+  "message": "Invalid token",
+  "code": 401
 }
 ```
