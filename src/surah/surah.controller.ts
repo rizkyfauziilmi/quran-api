@@ -1,4 +1,4 @@
-import { Controller, Get, Query, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { Surah } from '@prisma/client';
 import { ApiResponse } from 'src/common/dto/api-response.dto';
 import { QuerySurahsDto } from './dto/surah-query.dto';
@@ -15,12 +15,9 @@ export class SurahController {
   ): Promise<ApiResponse<{ items: Surah[]; pagination: PaginationDto }>> {
     const surahs = await this.surahService.getAllSurahs(querySurahsDto);
 
-    if (surahs.length === 0) {
-      throw new NotFoundException('No Surahs found');
-    }
-
     const totalSurahs =
       await this.surahService.countTotalSurahs(querySurahsDto);
+    const isEmpty = surahs.length === 0;
 
     const pagination: PaginationDto = {
       currentPage: querySurahsDto.page,
@@ -39,7 +36,9 @@ export class SurahController {
         items: surahs,
         pagination,
       },
-      message: 'Surahs retrieved successfully',
+      message: isEmpty
+        ? 'Surah not found with given query'
+        : 'Surahs retrieved successfully',
       query: querySurahsDto,
     });
   }
