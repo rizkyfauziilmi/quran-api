@@ -3,6 +3,7 @@ import { SurahModule } from './surah/surah.module';
 import { LoggerModule } from './common/logger/logger.module';
 import { LoggerMiddleware } from './common/logger/logger.middleware';
 import { loggingMiddleware, PrismaModule, QueryInfo } from 'nestjs-prisma';
+import { JuzModule } from './juz/juz.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { loggingMiddleware, PrismaModule, QueryInfo } from 'nestjs-prisma';
     }),
     SurahModule,
     LoggerModule,
+    JuzModule,
   ],
 })
 export class AppModule implements NestModule {

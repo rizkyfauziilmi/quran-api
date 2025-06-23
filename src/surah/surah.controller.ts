@@ -1,12 +1,11 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { Surah } from '@prisma/client';
 import { ApiResponse } from 'src/common/dto/api-response.dto';
-import { SurahQueryDto, SurahsQueryDto } from './dto/surah-query.dto';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { SurahService } from './surah.service';
 import { CustomLogger } from 'src/common/logger/custom-logger.service';
-import { SurahParamDto } from './dto/surah-param.dto';
-import { SurahWithAyahsAndTranslation } from 'src/common/types/surah.type';
+import { SurahParamDto, SurahQueryDto, SurahsQueryDto } from './dto';
+import { PaginationDto } from 'src/common/dto';
+import { SurahWithAyahsAndTranslations } from './types';
 
 @Controller({
   version: '1',
@@ -19,7 +18,7 @@ export class SurahController {
   ) {}
 
   @Get('/')
-  async getAllSurahs(
+  async getSurahs(
     @Query() surahsQueryDto: SurahsQueryDto,
   ): Promise<ApiResponse<{ items: Surah[]; pagination: PaginationDto }>> {
     const surahs = await this.surahService.findAll(surahsQueryDto);
@@ -51,10 +50,10 @@ export class SurahController {
   }
 
   @Get(':number')
-  async getSurahByNumber(
+  async getSurah(
     @Param() surahParamDto: SurahParamDto,
     @Query() surahQueryDto: SurahQueryDto,
-  ): Promise<ApiResponse<SurahWithAyahsAndTranslation>> {
+  ): Promise<ApiResponse<SurahWithAyahsAndTranslations>> {
     const { number } = surahParamDto;
 
     const surah = await this.surahService.findOne(number, surahQueryDto);

@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 
-export type SurahWithAyahsAndTranslation = Prisma.SurahGetPayload<{
+export type SurahWithAyahsAndTranslations = Prisma.SurahGetPayload<{
   include: {
     ayahs: {
       include: {

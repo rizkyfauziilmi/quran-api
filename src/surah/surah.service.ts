@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Surah } from '@prisma/client';
-import { SurahQueryDto, SurahsQueryDto } from './dto/surah-query.dto';
 import { CustomLogger } from 'src/common/logger/custom-logger.service';
 import { PrismaService } from 'nestjs-prisma';
-import { SurahWithAyahsAndTranslation } from 'src/common/types/surah.type';
+import { SurahQueryDto, SurahsQueryDto } from './dto';
+import { SurahWithAyahsAndTranslations } from './types';
 
 @Injectable()
 export class SurahService {
@@ -44,7 +44,7 @@ export class SurahService {
   async findOne(
     number: number,
     surahQueryDto: SurahQueryDto,
-  ): Promise<SurahWithAyahsAndTranslation> {
+  ): Promise<SurahWithAyahsAndTranslations> {
     this.logger.log(
       `Fetching surah by number ${number} with query ${JSON.stringify(surahQueryDto)}`,
       SurahService.name,
