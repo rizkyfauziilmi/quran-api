@@ -25,7 +25,7 @@ export class SurahController {
     const surahs = await this.surahService.findAll(surahsQueryDto);
 
     const totalSurahs = await this.surahService.count(surahsQueryDto);
-    const isEmpty = surahs.length === 0;
+    const isEmpty = totalSurahs === 0;
 
     const { limit, page } = surahsQueryDto;
     const pagination: PaginationDto = {
@@ -35,7 +35,7 @@ export class SurahController {
       hasNextPage: page + 1 <= Math.ceil(totalSurahs / limit),
       hasPreviousPage: page > 1,
       totalPages: Math.ceil(totalSurahs / limit),
-      totalItems: surahs.length,
+      totalItems: totalSurahs,
     };
 
     return new ApiResponse({
