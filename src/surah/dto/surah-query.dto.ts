@@ -16,27 +16,27 @@ export class QuerySurahsDto {
   @IsOptional()
   @IsInt()
   @Min(1, {
-    message: 'The value must be a positive integer.',
+    message: 'Juz must be at least 1.',
   })
   @Max(30, {
-    message: 'The value must be a positive integer less than or equal to 30.',
+    message: 'Juz must not exceed 30.',
   })
   juz?: number;
 
   @IsOptional()
   @IsInt()
   @Min(1, {
-    message: 'The value must be a positive integer.',
+    message: 'Page number must be at least 1.',
   })
   page: number = 1;
 
   @IsOptional()
   @IsInt()
   @Min(1, {
-    message: 'The value must be a positive integer.',
+    message: 'Limit must be at least 1.',
   })
   @Max(114, {
-    message: 'The value must be a positive integer less than or equal to 114.',
+    message: 'Limit must not exceed 114.',
   })
   limit: number = 10;
 }

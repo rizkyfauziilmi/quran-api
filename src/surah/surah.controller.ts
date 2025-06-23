@@ -4,11 +4,16 @@ import { ApiResponse } from 'src/common/dto/api-response.dto';
 import { QuerySurahsDto } from './dto/surah-query.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { SurahService } from './surah.service';
+import { CustomLogger } from 'src/common/logger/custom-logger.service';
 
 @Controller('/api/surahs')
 export class SurahController {
-  constructor(private surahService: SurahService) {}
+  constructor(
+    private surahService: SurahService,
+    private readonly logger: CustomLogger,
+  ) {}
 
+  // TODO: use pagination extension
   @Get('/')
   async getAllSurahs(
     @Query() querySurahsDto: QuerySurahsDto,
@@ -18,6 +23,13 @@ export class SurahController {
     const totalSurahs =
       await this.surahService.countTotalSurahs(querySurahsDto);
     const isEmpty = surahs.length === 0;
+
+    if (isEmpty) {
+      this.logger.warn(
+        'No surahs found, returning empty array',
+        SurahController.name,
+      );
+    }
 
     const pagination: PaginationDto = {
       currentPage: querySurahsDto.page,
