@@ -41,7 +41,7 @@ export class SurahService {
     return surahs;
   }
 
-  async findByNumber(
+  async findOne(
     number: number,
     surahQueryDto: SurahQueryDto,
   ): Promise<SurahWithAyahsAndTranslation> {

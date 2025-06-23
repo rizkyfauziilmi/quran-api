@@ -57,7 +57,7 @@ export class SurahController {
   ): Promise<ApiResponse<SurahWithAyahsAndTranslation>> {
     const { number } = surahParamDto;
 
-    const surah = await this.surahService.findByNumber(number, surahQueryDto);
+    const surah = await this.surahService.findOne(number, surahQueryDto);
 
     return new ApiResponse({
       data: surah,
