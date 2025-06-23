@@ -1,4 +1,4 @@
-# Quran API Endpoints Documentation
+## Quran API Endpoints Documentation
 
 This API provides **read-only** access to Quranic data: Surahs, Juzs, Ayahs, and Translations. All endpoints return JSON.
 
@@ -6,20 +6,23 @@ This API provides **read-only** access to Quranic data: Surahs, Juzs, Ayahs, and
 
 ## Response Format
 
-All responses follow this structure:
+All **successful** responses follow this structure:
+
 ```json
 {
   "status": "success",
   "message": "OK",
-  "data": ... // the actual result (object, array, or null)
+  "data": /* object, array, or null */
 }
 ```
-For errors:
+
+All **error** responses follow this structure:
+
 ```json
 {
   "status": "error",
-  "message": "Not Found",
-  "code": 404
+  "code": 404,
+  "message": "Not Found"
 }
 ```
 
@@ -28,11 +31,18 @@ For errors:
 ## Surahs
 
 ### List All Surahs
-- **GET** `/
-api/surahs`
-- **Query:** `classification`, `juz`, `page`, `limit`
-- **Returns:** Array of Surahs
-**Example:**
+
+* **Endpoint**: `GET /api/surahs`
+* **Query Parameters**:
+
+  * `classification` (optional): "Meccan" or "Medinan"
+  * `juz` (optional): Juz number (1–30)
+  * `page` (optional): Page number (default: 1)
+  * `limit` (optional): Items per page (default: 10)
+* **Response**: Array of Surah objects
+
+**Example**:
+
 ```json
 {
   "status": "success",
@@ -42,20 +52,26 @@ api/surahs`
       "number": 1,
       "arabicName": "الفاتحة",
       "latinName": "Al-Fatihah",
-      "surahMeaning": "The Opening",
-      "ayahsCount": 7,
+      "meaning": "The Opening",
+      "ayahCount": 7,
       "classification": "Meccan",
-      "juzId": 1
+      "juz": 1
     }
-    // ...
+    // ... more surahs
   ]
 }
 ```
 
 ### Get Surah by Number
-- **GET** `/api/surahs/:number`
-- **Returns:** Surah with Ayahs
-**Example:**
+
+* **Endpoint**: `GET /api/surahs/:number`
+* **Query Parameters**:
+
+  * `languageCode` (optional): Filter which translation to include for each Ayah (e.g., `en`, `id`). Omitting this will include all available translations.
+* **Response**: Single Surah object with its Ayahs and nested Translations
+
+**Example**:
+
 ```json
 {
   "status": "success",
@@ -64,19 +80,22 @@ api/surahs`
     "number": 1,
     "arabicName": "الفاتحة",
     "latinName": "Al-Fatihah",
-    "surahMeaning": "The Opening",
-    "ayahsCount": 7,
+    "meaning": "The Opening",
+    "ayahCount": 7,
     "classification": "Meccan",
-    "juzId": 1,
+    "juz": 1,
     "ayahs": [
       {
         "id": 1,
         "number": 1,
         "arabicText": "...",
-        "originalArabicText": "...",
-        "transliteration": "Bismillahir Rahmanir Raheem"
+        "transliteration": "Bismillahir Rahmanir Raheem",
+        "translations": [
+          { "languageCode": "en", "text": "In the name of Allah, the Most Gracious..." },
+          { "languageCode": "id", "text": "Dengan nama Allah Yang Maha Pengasih..." }
+        ]
       }
-      // ...
+      // ... more ayahs
     ]
   }
 }
@@ -87,9 +106,12 @@ api/surahs`
 ## Juzs
 
 ### List All Juzs
-- **GET** `/api/juzs`
-- **Returns:** Array of Juzs
-**Example:**
+
+* **Endpoint**: `GET /api/juzs`
+* **Response**: Array of Juz objects
+
+**Example**:
+
 ```json
 {
   "status": "success",
@@ -100,15 +122,18 @@ api/surahs`
       "arabicName": "الجزء الأول",
       "latinName": "Al-Juz' al-Awwal"
     }
-    // ...
+    // ... more juzs
   ]
 }
 ```
 
 ### Get Juz by Number
-- **GET** `/api/juzs/:number`
-- **Returns:** Juz with Surahs
-**Example:**
+
+* **Endpoint**: `GET /api/juzs/:number`
+* **Response**: Single Juz object with its Surahs
+
+**Example**:
+
 ```json
 {
   "status": "success",
@@ -123,7 +148,7 @@ api/surahs`
         "arabicName": "الفاتحة",
         "latinName": "Al-Fatihah"
       }
-      // ...
+      // ... more surahs
     ]
   }
 }
@@ -134,10 +159,16 @@ api/surahs`
 ## Ayahs
 
 ### List Ayahs of a Surah
-- **GET** `/api/surahs/:surahNumber/ayahs`
-- **Query:** `page`, `limit`
-- **Returns:** Array of Ayahs
-**Example:**
+
+* **Endpoint**: `GET /api/surahs/:surahNumber/ayahs`
+* **Query Parameters**:
+
+  * `page` (optional): Page number (default: 1)
+  * `limit` (optional): Items per page (default: 10)
+* **Response**: Array of Ayah objects
+
+**Example**:
+
 ```json
 {
   "status": "success",
@@ -147,18 +178,20 @@ api/surahs`
       "id": 1,
       "number": 1,
       "arabicText": "...",
-      "originalArabicText": "...",
       "transliteration": "Bismillahir Rahmanir Raheem"
     }
-    // ...
+    // ... more ayahs
   ]
 }
 ```
 
 ### Get Ayah by ID
-- **GET** `/api/ayahs/:id`
-- **Returns:** Ayah with Translations
-**Example:**
+
+* **Endpoint**: `GET /api/ayahs/:id`
+* **Response**: Single Ayah object with its Translations
+
+**Example**:
+
 ```json
 {
   "status": "success",
@@ -167,15 +200,14 @@ api/surahs`
     "id": 1,
     "number": 1,
     "arabicText": "...",
-    "originalArabicText": "...",
     "transliteration": "...",
-    "surahId": 1,
+    "surahNumber": 1,
     "translations": [
       {
         "languageCode": "en",
-        "translatedText": "In the name of Allah, the Most Gracious, the Most Merciful"
+        "text": "In the name of Allah, the Most Gracious, the Most Merciful"
       }
-      // ...
+      // ... more translations
     ]
   }
 }
@@ -186,10 +218,15 @@ api/surahs`
 ## Translations
 
 ### List Translations for an Ayah
-- **GET** `/api/ayahs/:ayahId/translations`
-- **Query:** `languageCode`
-- **Returns:** Array of Translations
-**Example:**
+
+* **Endpoint**: `GET /api/ayahs/:ayahId/translations`
+* **Query Parameters**:
+
+  * `languageCode` (optional): Filter by language (e.g., `en`)
+* **Response**: Array of Translation objects
+
+**Example**:
+
 ```json
 {
   "status": "success",
@@ -197,24 +234,27 @@ api/surahs`
   "data": [
     {
       "languageCode": "en",
-      "translatedText": "In the name of Allah, the Most Gracious, the Most Merciful"
+      "text": "In the name of Allah, the Most Gracious, the Most Merciful"
     }
-    // ...
+    // ... more translations
   ]
 }
 ```
 
 ### Get Translation by Ayah and Language
-- **GET** `/api/ayahs/:ayahId/translations/:languageCode`
-- **Returns:** Translation
-**Example:**
+
+* **Endpoint**: `GET /api/ayahs/:ayahId/translations/:languageCode`
+* **Response**: Single Translation object
+
+**Example**:
+
 ```json
 {
   "status": "success",
   "message": "OK",
   "data": {
     "languageCode": "en",
-    "translatedText": "In the name of Allah, the Most Gracious, the Most Merciful"
+    "text": "In the name of Allah, the Most Gracious, the Most Merciful"
   }
 }
 ```
@@ -224,10 +264,18 @@ api/surahs`
 ## Search & Advanced
 
 ### Search Ayahs
-- **GET** `/api/ayahs/search`
-- **Query:** `q`, `languageCode`, `surah`, `juz`
-- **Returns:** Array of Ayahs
-**Example:**
+
+* **Endpoint**: `GET /api/ayahs/search`
+* **Query Parameters**:
+
+  * `q`: Search term (text)
+  * `languageCode` (optional)
+  * `surah` (optional): Surah number
+  * `juz` (optional): Juz number
+* **Response**: Array of Ayah objects
+
+**Example**:
+
 ```json
 {
   "status": "success",
@@ -237,20 +285,24 @@ api/surahs`
       "id": 1,
       "number": 1,
       "arabicText": "...",
-      "originalArabicText": "...",
       "transliteration": "Bismillahir Rahmanir Raheem",
-      "surahId": 1
+      "surahNumber": 1
     }
-    // ...
+    // ... more results
   ]
 }
 ```
 
 ### Get Random Ayah
-- **GET** `/api/ayahs/random`
-- **Query:** `languageCode`
-- **Returns:** Random Ayah
-**Example:**
+
+* **Endpoint**: `GET /api/ayahs/random`
+* **Query Parameters**:
+
+  * `languageCode` (optional)
+* **Response**: Single random Ayah object with Translations
+
+**Example**:
+
 ```json
 {
   "status": "success",
@@ -259,13 +311,12 @@ api/surahs`
     "id": 5,
     "number": 5,
     "arabicText": "...",
-    "originalArabicText": "...",
     "transliteration": "...",
-    "surahId": 1,
+    "surahNumber": 1,
     "translations": [
       {
         "languageCode": "en",
-        "translatedText": "Master of the Day of Judgment"
+        "text": "Master of the Day of Judgment"
       }
     ]
   }
@@ -273,13 +324,3 @@ api/surahs`
 ```
 
 ---
-
-## Error Example
-
-```json
-{
-  "status": "error",
-  "message": "Invalid token",
-  "code": 401
-}
-```

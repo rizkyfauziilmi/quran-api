@@ -12,7 +12,8 @@ export class ApiResponse<T> {
   }) {
     this.status = options.status ?? 'success';
     this.message = options.message ?? 'success';
-    if (options.query) {
+    // only show query params if they exist
+    if (options.query && Object.keys(options.query).length > 0) {
       this.query = options.query;
     }
     this.data = options.data;
