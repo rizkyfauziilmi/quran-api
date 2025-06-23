@@ -8,7 +8,10 @@ import { CustomLogger } from 'src/common/logger/custom-logger.service';
 import { SurahParamDto } from './dto/surah-param.dto';
 import { SurahWithAyahsAndTranslation } from 'src/common/types/surah.type';
 
-@Controller('/api/surahs')
+@Controller({
+  version: '1',
+  path: 'surahs',
+})
 export class SurahController {
   constructor(
     private surahService: SurahService,

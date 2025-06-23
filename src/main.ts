@@ -1,6 +1,6 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { CustomLogger } from './common/logger/custom-logger.service';
 import { PrismaClientExceptionFilter } from 'nestjs-prisma';
 
@@ -18,8 +18,13 @@ async function bootstrap() {
     }),
   );
   app.useLogger(app.get(CustomLogger));
+
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
+
+  app.enableVersioning({
+    type: VersioningType.URI,
+  });
 
   await app.listen(process.env.PORT ?? 3000);
 }
