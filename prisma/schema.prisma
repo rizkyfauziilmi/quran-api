@@ -1,0 +1,62 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Surah {
+  number         Int    @id @unique
+  arabicName     String @unique
+  latinName      String @unique
+  surahMeaning   String
+  ayahsCount     Int
+  classification String
+
+  juzId Int
+  juz   Juz @relation(fields: [juzId], references: [number], onDelete: Cascade)
+
+  ayahs Ayah[]
+
+  @@map("surahs")
+}
+
+model Juz {
+  number     Int    @id @unique
+  arabicName String
+  latinName  String
+
+  surahs Surah[]
+
+  @@map("juzs")
+}
+
+model Ayah {
+  id                 Int    @id @default(autoincrement())
+  number             Int
+  arabicText         String
+  originalArabicText String
+  transliteration    String
+
+  surahId Int
+  surah   Surah @relation(fields: [surahId], references: [number], onDelete: Cascade)
+
+  translations Translation[]
+
+  @@unique([number, surahId])
+  @@map("ayahs")
+}
+
+model Translation {
+  id             Int    @id @default(autoincrement())
+  languageCode   String // Use ISO 639-1 codes, e.g., "en", "ar", "fr"
+  translatedText String
+
+  ayahId Int
+  ayah   Ayah @relation(fields: [ayahId], references: [id], onDelete: Cascade)
+
+  @@unique([ayahId, languageCode])
+  @@map("translations")
+}
